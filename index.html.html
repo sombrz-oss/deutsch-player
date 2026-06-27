@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Deutsch Player">
+<title>Deutsch Player</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#f5f5f5;padding:16px;max-width:600px;margin:0 auto}
+.card{background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:16px;margin-bottom:12px}
+h1{font-size:16px;font-weight:600;margin-bottom:4px;color:#111}
+.subtitle{font-size:12px;color:#888;margin-bottom:12px}
+.sec-title{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.field-lbl{font-size:12px;color:#666;margin-bottom:4px}
+select{width:100%;padding:9px 10px;font-size:13px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#111}
+.test-btn{width:100%;padding:8px;font-size:12px;border:1px solid #ddd;border-radius:8px;background:#f5f5f5;color:#555;cursor:pointer;margin-top:4px}
+.mode-wrap{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.mode-btn{padding:10px 8px;border:1.5px solid #ddd;border-radius:10px;background:#fff;cursor:pointer;text-align:center;-webkit-tap-highlight-color:transparent}
+.mode-btn .mode-icon{font-size:15px;margin-bottom:3px}
+.mode-btn .mode-title{font-size:12px;font-weight:600;color:#333;display:block}
+.mode-btn .mode-desc{font-size:11px;color:#999;display:block;line-height:1.4;margin-top:2px}
+.mode-btn.active{border-color:#1a5fa8;background:#EBF4FF}
+.mode-btn.active .mode-title{color:#1a5fa8}
+.flow-box{font-size:12px;color:#666;background:#f5f5f5;padding:8px 12px;border-radius:8px;margin-bottom:10px;line-height:1.8}
+.keepalive-status{font-size:11px;color:#aaa;text-align:center;margin-top:4px}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#aaa;margin-right:4px}
+.dot.active{background:#22c55e}
+.group-label{font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.06em;margin:14px 0 6px;padding-left:2px}
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:8px;margin-bottom:6px}
+.tbtn{padding:10px;border:1px solid #e0e0e0;border-radius:10px;background:#fff;cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent}
+.tbtn .ico{font-size:17px;display:block;margin-bottom:3px}
+.tbtn .nm{display:block;font-weight:600;color:#111;font-size:12px}
+.tbtn .cnt{display:block;font-size:11px;color:#aaa}
+.tbtn.active{background:#EBF4FF;border-color:#90C2FF}
+.tbtn.active .nm{color:#1a5fa8}
+.status-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.badge{font-size:13px;padding:4px 12px;border-radius:10px;font-weight:600}
+.b-de{background:#EBF4FF;color:#1a5fa8}
+.b-pt{background:#E8F7ED;color:#1a7a3c}
+.b-rep{background:#F0EEFF;color:#5040b0}
+.b-idle{background:#f0f0f0;color:#777}
+.sentbox{min-height:100px;padding:14px;background:#f8f8f8;border-radius:10px;margin-bottom:10px;position:relative}
+.slang{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#aaa;margin-bottom:5px}
+.sde{font-size:18px;font-weight:600;color:#111;line-height:1.5;margin-bottom:6px}
+.spt{font-size:14px;color:#555;line-height:1.5}
+.snote{font-size:11px;color:#aaa;font-style:italic;margin-top:4px}
+.cd-wrap{display:flex;align-items:center;gap:8px;margin-top:10px;opacity:0;transition:opacity .2s}
+.cd-wrap.show{opacity:1}
+.cd-bar-bg{flex:1;height:6px;background:#ddd;border-radius:3px;overflow:hidden}
+.cd-bar-fill{height:100%;background:#5040b0;border-radius:3px;transition:width .95s linear}
+.cd-num{font-size:15px;font-weight:600;color:#5040b0;min-width:24px;text-align:right}
+.prog-labels{display:flex;justify-content:space-between;font-size:12px;color:#888;margin-bottom:4px}
+.prog-bar{width:100%;height:5px;background:#eee;border-radius:3px;overflow:hidden;margin-bottom:12px;cursor:pointer}
+.prog-fill{height:100%;background:#1a5fa8;border-radius:3px;transition:width .3s}
+.controls{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:12px}
+.cbtn{width:52px;height:52px;border-radius:50%;border:1px solid #ddd;background:#fff;color:#333;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;-webkit-tap-highlight-color:transparent}
+.cbtn:active{transform:scale(.92)}
+.cbtn.play{width:68px;height:68px;font-size:28px;background:#1a5fa8;color:#fff;border-color:#1a5fa8}
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px}
+.si{display:flex;flex-direction:column;gap:4px}
+.sl{font-size:12px;color:#666}
+.sl b{color:#111;font-weight:600}
+input[type=range]{width:100%}
+.shuf-row{display:flex;align-items:center;gap:8px;margin-top:4px}
+.shuf-row label{font-size:12px;color:#666}
+.msgbox{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:12px;display:none}
+.ok{background:#E8F7ED;border:1px solid #8DD4A8;color:#1a7a3c}
+.err{background:#FEECEC;border:1px solid #F5A5A5;color:#b91c1c}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>🇩🇪 Deutsch Player</h1>
+  <p class="subtitle">22 temas · 280+ frases · aulas K13-20 + temas práticos</p>
+  <div class="sec-title">Vozes do dispositivo</div>
+  <div class="two-col">
+    <div>
+      <div class="field-lbl">Voz Alemão</div>
+      <select id="selDE"></select>
+      <button class="test-btn" onclick="testVoice('de')">▶ Testar alemão</button>
+    </div>
+    <div>
+      <div class="field-lbl">Voz Português</div>
+      <select id="selPT"></select>
+      <button class="test-btn" onclick="testVoice('pt')">▶ Testar português</button>
+    </div>
+  </div>
+  <div class="sec-title">Modo de estudo</div>
+  <div class="mode-wrap">
+    <button class="mode-btn active" id="mode-de-pt" onclick="setMode('de-pt')">
+      <div class="mode-icon">🇩🇪→🇧🇷</div>
+      <span class="mode-title">DE → PT</span>
+      <span class="mode-desc">Alemão primeiro, repita, depois português</span>
+    </button>
+    <button class="mode-btn" id="mode-pt-de" onclick="setMode('pt-de')">
+      <div class="mode-icon">🇧🇷→🇩🇪</div>
+      <span class="mode-title">PT → DE</span>
+      <span class="mode-desc">Português primeiro, prepare, depois alemão</span>
+    </button>
+  </div>
+  <div class="flow-box" id="flowBox">
+    🇩🇪 <b>Alemão</b> → ⏸️ <b>Repita</b> → 🇩🇪 <b>Alemão de novo</b> → ⏸️ <b>Repita</b> → 🇧🇷 <b>Português</b>
+  </div>
+  <div class="keepalive-status"><span class="dot" id="kaDot"></span><span id="kaStatus">Áudio de fundo: inativo</span></div>
+</div>
+
+<div class="msgbox" id="msg"></div>
+
+<div class="group-label">📚 Das suas aulas — Kapitel 13 ao 20</div>
+<div class="tgrid" id="tgrid-aulas"></div>
+
+<div class="group-label">🌍 Temas práticos do dia a dia</div>
+<div class="tgrid" id="tgrid-temas"></div>
+
+<div class="group-label">🔧 Temas novos</div>
+<div class="tgrid" id="tgrid-novos"></div>
+
+<div class="card">
+  <div class="status-row">
+    <span class="badge b-idle" id="badge">Pronto</span>
+    <span style="font-size:13px;color:#888" id="ctxt">— / —</span>
+  </div>
+  <div class="sentbox">
+    <div class="slang" id="slang">Escolha um tema e pressione play</div>
+    <div class="sde" id="sde">—</div>
+    <div class="spt" id="spt"></div>
+    <div class="snote" id="snote"></div>
+    <div class="cd-wrap" id="cdWrap">
+      <div class="cd-bar-bg"><div class="cd-bar-fill" id="cdBar" style="width:100%"></div></div>
+      <div class="cd-num" id="cdNum"></div>
+    </div>
+  </div>
+  <div class="prog-labels"><span id="ppct">0%</span><span id="pof">0 de 0</span></div>
+  <div class="prog-bar" onclick="seekBar(event)"><div class="prog-fill" id="pfill" style="width:0%"></div></div>
+  <div class="controls">
+    <button class="cbtn" onclick="go(-1)">&#9664;&#9664;</button>
+    <button class="cbtn play" id="pbtn" onclick="togglePlay()">&#9654;</button>
+    <button class="cbtn" onclick="go(1)">&#9654;&#9654;</button>
+  </div>
+  <div class="sgrid">
+    <div class="si"><label class="sl">Velocidade DE: <b id="rdv">0.82x</b></label><input type="range" min="0.5" max="1.3" step="0.02" value="0.82" oninput="document.getElementById('rdv').textContent=parseFloat(this.value).toFixed(2)+'x'" id="rde"></div>
+    <div class="si"><label class="sl">Velocidade PT: <b id="rpv">1.0x</b></label><input type="range" min="0.5" max="1.3" step="0.02" value="1.0" oninput="document.getElementById('rpv').textContent=parseFloat(this.value).toFixed(2)+'x'" id="rpt"></div>
+    <div class="si"><label class="sl">Pausa para repetir: <b id="repv">4s</b></label><input type="range" min="2" max="12" step="1" value="4" oninput="document.getElementById('repv').textContent=this.value+'s'" id="repi"></div>
+    <div class="si"><label class="sl">Pausa entre frases: <b id="pauv">1.5s</b></label><input type="range" min="0.5" max="6" step="0.5" value="1.5" oninput="document.getElementById('pauv').textContent=this.value+'s'" id="paui"></div>
+  </div>
+  <div class="shuf-row"><input type="checkbox" id="shuf" onchange="rebuild()"><label for="shuf">Shuffle (ordem aleatória)</label></div>
+</div>
+
+<script>
+const TOPICS_AULAS={
+  berlin:{icon:"🏛️",name:"Berlim K13",s:[
+    {de:"Berlin ist die Hauptstadt Deutschlands.",pt:"Berlim é a capital da Alemanha."},
+    {de:"Ich kenne das Brandenburger Tor und den Tiergarten.",pt:"Conheço o Portão de Brandemburgo e o Tiergarten.",note:"den (der) – Akkusativ"},
+    {de:"Berlin war früher getrennt.",pt:"Berlim era separada antes."},
+    {de:"Ich war in Berlin im August zweitausendvierundzwanzig.",pt:"Estive em Berlim em agosto de 2024."},
+    {de:"Ich war mit meiner Frau auf vielen Flohmärkten.",pt:"Estava com minha esposa em muitos mercados de pulgas.",note:"mit + Dativ: meiner (die) Frau"},
+    {de:"Berlin ist multikulturell und interessant.",pt:"Berlim é multicultural e interessante."},
+    {de:"Die Stadt hat eine sehr traurige Geschichte.",pt:"A cidade tem uma história muito triste."},
+    {de:"In Berlin gibt es viele Flohmärkte.",pt:"Em Berlim existem muitos mercados de pulgas.",note:"es gibt + Akkusativ"},
+    {de:"So schwer ist Deutsch auch wieder nicht.",pt:"O alemão não é tão difícil assim."},
+    {de:"Deutsch ist einfach anders.",pt:"O alemão é simplesmente diferente."},
+  ]},
+  stadtk14:{icon:"🗺️",name:"Wegbeschr. K14",s:[
+    {de:"Entschuldigung, können Sie mir helfen?",pt:"Com licença, o senhor pode me ajudar?",note:"helfen + Dativ: mir"},
+    {de:"Ich suche die nächste Apotheke.",pt:"Estou procurando a farmácia mais próxima."},
+    {de:"Gehen Sie nach rechts und dann geradeaus.",pt:"Vá à direita e depois em frente.",note:"Imperativ Sie"},
+    {de:"Nehmen Sie die erste Straße links.",pt:"Pegue a primeira rua à esquerda."},
+    {de:"Das Rathaus ist auf der rechten Seite.",pt:"A prefeitura fica do lado direito.",note:"auf + Dativ"},
+    {de:"Biegen Sie an der Ampel nach links ab.",pt:"Vire à esquerda no semáforo.",note:"ab|biegen separável"},
+    {de:"Wir stehen vor dem Kaufhaus.",pt:"Estamos em frente ao shopping.",note:"vor + Dativ"},
+    {de:"Die Post ist gar nicht weit.",pt:"Os correios não ficam longe de jeito nenhum.",note:"gar nicht = negação forte"},
+    {de:"Ich bin falsch abgebogen.",pt:"Eu virei errado.",note:"Perfekt: ab|biegen → sein + abgebogen"},
+    {de:"Es gibt keinen Bahnhof in meiner Stadt.",pt:"Não há estação de trem na minha cidade.",note:"kein + Akkusativ"},
+    {de:"In São Paulo gibt es viel Stau.",pt:"Em São Paulo tem muito engarrafamento."},
+    {de:"Der Park ist nicht weit weg.",pt:"O parque não fica muito longe."},
+  ]},
+  casak15:{icon:"🏠",name:"Wohnung K15",s:[
+    {de:"Das Wohnzimmer ist rechts neben dem Balkon.",pt:"A sala de estar fica à direita da sacada.",note:"neben + Dativ"},
+    {de:"Der Eingang ist gegenüber dem Wohnzimmer.",pt:"A entrada fica em frente à sala.",note:"gegenüber + Dativ"},
+    {de:"Ich wohne im ersten Stock.",pt:"Eu moro no primeiro andar.",note:"im = in + dem"},
+    {de:"Mein Gebäude hat dreizehn Stockwerke.",pt:"Meu prédio tem treze andares."},
+    {de:"Ich habe keinen Keller und keine Garage.",pt:"Eu não tenho porão nem garagem.",note:"kein no Akkusativ"},
+    {de:"Die Küche ist neben dem Waschraum.",pt:"A cozinha fica ao lado da lavanderia.",note:"neben + Dativ"},
+    {de:"Das Schlafzimmer ist hinter dem Flur.",pt:"O quarto fica atrás do corredor.",note:"hinter + Dativ"},
+    {de:"Meine Traumwohnung hat einen großen Garten.",pt:"Minha casa dos sonhos tem um jardim grande.",note:"einen (der) – Akkusativ"},
+    {de:"Die Warmmiete ist mit Heizkosten.",pt:"O aluguel quente inclui as despesas de aquecimento."},
+    {de:"Das Zimmer ist vierzehn Quadratmeter groß.",pt:"O quarto tem catorze metros quadrados."},
+    {de:"Er zieht jetzt in die WG ein.",pt:"Ele está entrando no apartamento compartilhado agora.",note:"ein|ziehen separável"},
+    {de:"Ich wohne über meinem Bruder.",pt:"Eu moro acima do meu irmão.",note:"über + Dativ"},
+  ]},
+  aufzugk16:{icon:"🛗",name:"Aufzug K16",s:[
+    {de:"Der Aufzug fährt ins Erdgeschoss.",pt:"O elevador vai ao térreo."},
+    {de:"Der Aufzug steckt im dritten Stock fest.",pt:"O elevador está preso no terceiro andar.",note:"fest|stecken separável"},
+    {de:"Ich bin einmal im Aufzug festgesteckt.",pt:"Uma vez fiquei preso no elevador.",note:"Perfekt com sein"},
+    {de:"Ich hatte große Panik, aber ich habe es überlebt.",pt:"Tive muito pânico, mas sobrevivi."},
+    {de:"Was ist los? Kann ich Ihnen helfen?",pt:"O que há? Posso ajudá-lo?",note:"helfen + Dativ: Ihnen"},
+    {de:"Kein Problem! Das kann ich reparieren.",pt:"Sem problema! Isso eu consigo consertar."},
+    {de:"Ich möchte einen Termin vorschlagen.",pt:"Gostaria de propor um horário.",note:"vor|schlagen separável"},
+    {de:"Ich muss den Termin leider absagen.",pt:"Infelizmente preciso cancelar o compromisso.",note:"ab|sagen separável"},
+    {de:"Können wir den Termin verschieben?",pt:"Podemos remarcar o compromisso?"},
+    {de:"Die Klimaanlage funktioniert nicht.",pt:"O ar-condicionado não está funcionando."},
+  ]},
+  zukunftk17:{icon:"🔮",name:"Zukunft K17",s:[
+    {de:"Ich werde morgen früh aufwachen.",pt:"Vou acordar cedo amanhã.",note:"Futur I: werden + Infinitiv"},
+    {de:"Er wird nächstes Jahr Vater werden.",pt:"Ele vai se tornar pai no próximo ano.",note:"werden = tornar-se"},
+    {de:"Wir werden in den USA und in Deutschland arbeiten.",pt:"Vamos trabalhar nos EUA e na Alemanha."},
+    {de:"Sie wird bald eine eigene Firma gründen.",pt:"Ela vai fundar sua própria empresa em breve."},
+    {de:"Ich will auf jeden Fall Fußballspieler werden.",pt:"Quero a todo custo me tornar jogador de futebol.",note:"auf jeden Fall"},
+    {de:"Das ist nicht mein Ding.",pt:"Isso não é a minha praia."},
+    {de:"Ohne einen Kaffee macht die Arbeit keinen Spaß.",pt:"Sem um café o trabalho não tem graça.",note:"ohne + Akkusativ"},
+    {de:"Ich gehe nie ohne mein Handy aus dem Haus.",pt:"Nunca saio de casa sem meu celular."},
+    {de:"Ohne Führerschein darf man nicht Auto fahren.",pt:"Sem carteira de motorista não se pode dirigir.",note:"dürfen"},
+    {de:"Mit meiner Familie bin ich glücklich.",pt:"Com minha família sou feliz.",note:"mit + Dativ"},
+  ]},
+  gesundheitk18:{icon:"🏥",name:"Gesundheit K18",s:[
+    {de:"Mein Rücken tut weh.",pt:"Minhas costas doem.",note:"weh|tun = doer"},
+    {de:"Meine Augen tun weh von dem Bildschirm.",pt:"Meus olhos doem por causa da tela."},
+    {de:"Ich habe starke Kopfschmerzen.",pt:"Estou com uma dor de cabeça forte."},
+    {de:"Mein Arzt sagt, ich soll mehr Sport machen.",pt:"Meu médico diz que eu devo fazer mais esporte.",note:"sollen = dever"},
+    {de:"Was hilft gegen Kopfschmerzen?",pt:"O que ajuda para dor de cabeça?",note:"gegen + Akkusativ"},
+    {de:"Trinken Sie viel Wasser und Tee!",pt:"Beba bastante água e chá!",note:"Imperativ Sie"},
+    {de:"Ich lasse mich röntgen.",pt:"Estou fazendo raio-x.",note:"lassen + Infinitiv"},
+    {de:"Ich mache dreimal pro Woche Sport.",pt:"Faço exercício três vezes por semana."},
+    {de:"Ich schlafe nur sechs Stunden pro Nacht.",pt:"Eu durmo apenas seis horas por noite."},
+    {de:"Mein Arzt sagt, ich soll eine Physiotherapie machen.",pt:"Meu médico diz que eu devo fazer fisioterapia."},
+  ]},
+  hausarbeitk19:{icon:"🏡",name:"Hausarbeit K19",s:[
+    {de:"Räum dein Zimmer auf!",pt:"Arrume o seu quarto!",note:"Imperativ du: auf|räumen"},
+    {de:"Bring den Müll raus!",pt:"Tire o lixo!",note:"Imperativ du"},
+    {de:"Mach das Fenster auf, bitte.",pt:"Abra a janela, por favor."},
+    {de:"Sei bitte leise!",pt:"Por favor, seja quieto!",note:"sein → sei"},
+    {de:"Sei so lieb und mach das Licht an!",pt:"Seja um anjo e acenda a luz!"},
+    {de:"Das Auto ist kaputt. Ich muss es in die Werkstatt bringen.",pt:"O carro está quebrado. Preciso levá-lo à oficina.",note:"es = Akkusativ"},
+    {de:"Meine Hündin war gestresst. Ich bin mit ihr spazieren gegangen.",pt:"Minha cachorra estava estressada. Fui passear com ela.",note:"mit ihr = Dativ"},
+    {de:"Sei mir nicht böse!",pt:"Não fique bravo comigo!"},
+    {de:"Das finde ich nicht in Ordnung.",pt:"Acho que isso não está certo."},
+  ]},
+  dativ:{icon:"📐",name:"Dativ K13-19",s:[
+    {de:"Mir gefällt München besonders im Sommer.",pt:"Eu gosto muito de Munique no verão.",note:"gefallen + Dativ: Mir"},
+    {de:"Die Parks gefallen mir sehr gut.",pt:"Os parques me agradam muito."},
+    {de:"Ihm gefallen die Märkte in Berlin.",pt:"Ele gosta dos mercados em Berlim.",note:"ihm = Dativ (er)"},
+    {de:"Ihr gefällt die Bibliothek besonders gut.",pt:"Ela gosta especialmente da biblioteca.",note:"ihr = Dativ (sie)"},
+    {de:"Ihnen gefällt die Altstadt besonders gut.",pt:"Eles gostam especialmente do centro histórico."},
+    {de:"Ich danke dir für deine Hilfe.",pt:"Eu te agradeço pela sua ajuda.",note:"danken + Dativ: dir"},
+    {de:"Das Haus gehört meinem Vater.",pt:"A casa pertence ao meu pai.",note:"gehören + Dativ: meinem (der)"},
+    {de:"Das Fahrrad gehört meiner Schwester.",pt:"A bicicleta pertence à minha irmã.",note:"gehören + Dativ: meiner (die)"},
+    {de:"Mir schmeckt das Gericht sehr gut.",pt:"O prato está muito bom para mim.",note:"schmecken + Dativ"},
+    {de:"Kannst du mir kurz helfen?",pt:"Você pode me ajudar um momento?",note:"helfen + Dativ: mir"},
+    {de:"Ich war mit meiner Frau im Park.",pt:"Eu estava com minha esposa no parque.",note:"mit + Dativ: meiner (die)"},
+  ]},
+  akkusativ:{icon:"🎯",name:"Akkusativ K13-19",s:[
+    {de:"Ich sehe seinen Porsche in der Garage.",pt:"Eu vejo o Porsche dele na garagem.",note:"seinen (der) – Akkusativ"},
+    {de:"Ich habe ihren Stift nicht.",pt:"Eu não tenho a caneta dela.",note:"ihren (der) – Akkusativ"},
+    {de:"Das Auto ist kaputt, ich muss es reparieren.",pt:"O carro está quebrado, preciso consertá-lo.",note:"es = Pronomen"},
+    {de:"Ich lade dich zum Essen ein.",pt:"Eu te convido para comer.",note:"dich = Akkusativ (du)"},
+    {de:"Rufen Sie mich bitte an!",pt:"Por favor, me ligue!",note:"mich = Akkusativ (ich)"},
+    {de:"Siehst du den Hafen dort?",pt:"Você vê o porto ali?",note:"den (der) – Akkusativ"},
+    {de:"Ohne meinen Kollegen bin ich verloren.",pt:"Sem meu colega estou perdido.",note:"ohne + Akkusativ: meinen (der)"},
+  ]},
+  berufk20:{icon:"💡",name:"Beruf K20",s:[
+    {de:"Das Team sieht sehr sympathisch aus.",pt:"A equipe parece muito simpática.",note:"aus|sehen separável"},
+    {de:"Meine Haare sind schwarz und glatt.",pt:"Meus cabelos são pretos e lisos."},
+    {de:"Ich bin einen Meter achtzig groß.",pt:"Eu tenho um metro e oitenta de altura."},
+    {de:"Sie ist jünger als ich und sehr kreativ.",pt:"Ela é mais jovem que eu e muito criativa.",note:"Komparativ: jung → jünger"},
+    {de:"Ich habe ein Vorstellungsgespräch morgen.",pt:"Tenho uma entrevista de emprego amanhã."},
+    {de:"Bei einer Zusage bekomme ich den Job.",pt:"Com uma confirmação, fico com o emprego."},
+    {de:"Ich arbeite als selbstständiger Techniker.",pt:"Trabalho como técnico autônomo.",note:"als = como (profissão)"},
+    {de:"Ich bin Techniker für Hagelschadensreparatur.",pt:"Sou técnico de reparo de danos de granizo."},
+  ]},
+};
+
+const TOPICS_TEMAS={
+  viagem:{icon:"✈️",name:"Viagens",s:[
+    {de:"Ich möchte ein Zimmer für zwei Nächte buchen.",pt:"Gostaria de reservar um quarto por duas noites.",note:"buchen = reservar"},
+    {de:"Haben Sie noch freie Zimmer?",pt:"Vocês ainda têm quartos disponíveis?"},
+    {de:"Was kostet das Zimmer pro Nacht?",pt:"Quanto custa o quarto por noite?"},
+    {de:"Wann ist der Check-in und Check-out?",pt:"Quando é o check-in e o check-out?"},
+    {de:"Gibt es WLAN im Hotel?",pt:"Tem WiFi no hotel?"},
+    {de:"Kann ich mein Gepäck hier lassen?",pt:"Posso deixar minha bagagem aqui?"},
+    {de:"Wo ist der nächste Bahnhof?",pt:"Onde fica a próxima estação de trem?"},
+    {de:"Ich reise gern mit dem Zug.",pt:"Gosto de viajar de trem.",note:"mit + Dativ: dem Zug"},
+    {de:"Der Flug ist um achtzehn Uhr.",pt:"O voo é às dezoito horas."},
+    {de:"Ich habe meinen Reisepass vergessen.",pt:"Esqueci meu passaporte.",note:"Perfekt: vergessen"},
+    {de:"Wo kann ich ein Taxi bestellen?",pt:"Onde posso pedir um táxi?"},
+    {de:"Einmal hin und zurück, bitte.",pt:"Uma ida e volta, por favor."},
+    {de:"Wohin fährt dieser Zug?",pt:"Para onde vai esse trem?"},
+    {de:"Wie lange dauert die Fahrt zum Flughafen?",pt:"Quanto tempo dura o trajeto até o aeroporto?"},
+    {de:"Ist dieser Platz noch frei?",pt:"Este lugar ainda está livre?"},
+  ]},
+  hotel:{icon:"🏨",name:"Hotel",s:[
+    {de:"Ich habe eine Reservierung auf den Namen Nascimento.",pt:"Tenho uma reserva no nome Nascimento."},
+    {de:"Kann ich früher einchecken?",pt:"Posso fazer check-in mais cedo?"},
+    {de:"Das Zimmer ist zu laut.",pt:"O quarto é muito barulhento.",note:"zu + Adj. = demais"},
+    {de:"Können Sie mir ein ruhigeres Zimmer geben?",pt:"O senhor pode me dar um quarto mais tranquilo?"},
+    {de:"Ich brauche ein Handtuch.",pt:"Preciso de uma toalha."},
+    {de:"Wo ist das Frühstück?",pt:"Onde é o café da manhã?"},
+    {de:"Kann ich die Rechnung auf mein Zimmer stellen?",pt:"Posso colocar a conta no meu quarto?"},
+    {de:"Das Frühstück ist inklusive.",pt:"O café da manhã está incluso."},
+    {de:"Haben Sie ein Zimmer mit Balkon?",pt:"Vocês têm quarto com sacada?"},
+    {de:"Ich möchte auschecken.",pt:"Gostaria de fazer o check-out."},
+    {de:"Das Hotel ist sehr zentral gelegen.",pt:"O hotel fica muito bem localizado no centro."},
+    {de:"Gibt es einen Parkplatz beim Hotel?",pt:"Tem estacionamento no hotel?"},
+  ]},
+  restaurante:{icon:"🍽️",name:"Restaurante",s:[
+    {de:"Haben Sie einen Tisch für zwei Personen?",pt:"Vocês têm uma mesa para duas pessoas?"},
+    {de:"Ich möchte gern bestellen.",pt:"Gostaria de fazer o pedido.",note:"bestellen = pedir"},
+    {de:"Was empfehlen Sie?",pt:"O que o senhor recomenda?"},
+    {de:"Ich bin allergisch gegen Nüsse.",pt:"Sou alérgico a nozes.",note:"gegen + Akkusativ"},
+    {de:"Bringen Sie mir bitte die Speisekarte.",pt:"Por favor, me traga o cardápio."},
+    {de:"Das Essen schmeckt sehr gut.",pt:"A comida está muito gostosa.",note:"schmecken + Dativ"},
+    {de:"Die Rechnung, bitte.",pt:"A conta, por favor."},
+    {de:"Kann ich mit Kreditkarte zahlen?",pt:"Posso pagar com cartão de crédito?"},
+    {de:"Ist das vegetarisch?",pt:"Isso é vegetariano?"},
+    {de:"Ohne Zwiebeln, bitte.",pt:"Sem cebola, por favor.",note:"ohne + Akkusativ"},
+    {de:"Ich nehme das Tagesgericht.",pt:"Vou pegar o prato do dia."},
+    {de:"Getrennt oder zusammen?",pt:"Separado ou junto?"},
+    {de:"Ich möchte ein Glas Wasser, bitte.",pt:"Gostaria de um copo d'água, por favor."},
+    {de:"Das Fleisch ist zu durch.",pt:"A carne está bem passada demais."},
+  ]},
+  trabalho:{icon:"💼",name:"Trabalho",s:[
+    {de:"Können wir einen Termin vereinbaren?",pt:"Podemos combinar um horário?"},
+    {de:"Ich schicke Ihnen die Rechnung per E-Mail.",pt:"Enviarei a fatura por e-mail.",note:"schicken + Dativ: Ihnen"},
+    {de:"Können wir das auf morgen verschieben?",pt:"Podemos transferir para amanhã?"},
+    {de:"Das Projekt ist fast fertig.",pt:"O projeto está quase pronto."},
+    {de:"Wir arbeiten als Subunternehmer.",pt:"Trabalhamos como subcontratados."},
+    {de:"Bitte unterschreiben Sie hier.",pt:"Por favor, assine aqui."},
+    {de:"Wann ist die Deadline?",pt:"Qual é o prazo?"},
+    {de:"Die Werkstatt öffnet um acht Uhr.",pt:"A oficina abre às oito horas."},
+    {de:"Ich sende Ihnen den Vertrag zu.",pt:"Enviarei o contrato ao senhor.",note:"zu|senden + Dativ: Ihnen"},
+    {de:"Können Sie mir bitte helfen?",pt:"O senhor pode me ajudar, por favor?",note:"helfen + Dativ: mir"},
+  ]},
+  cidade:{icon:"🏙️",name:"Cidade",s:[
+    {de:"Wo ist die nächste U-Bahn-Haltestelle?",pt:"Onde fica a próxima estação de metrô?"},
+    {de:"Ist das weit von hier?",pt:"Fica longe daqui?"},
+    {de:"Gibt es hier einen Supermarkt in der Nähe?",pt:"Tem um supermercado aqui perto?"},
+    {de:"Gehen Sie über die Kreuzung und dann links.",pt:"Atravesse o cruzamento e depois vire à esquerda."},
+    {de:"Berlin hat eine sehr interessante Geschichte.",pt:"Berlim tem uma história muito interessante."},
+    {de:"Die Apotheke ist an der Ecke der Kreuzung.",pt:"A farmácia fica na esquina do cruzamento."},
+    {de:"Wir stehen vor dem Rathaus.",pt:"Estamos em frente à prefeitura.",note:"vor + Dativ"},
+  ]},
+  saude:{icon:"🩺",name:"Saúde",s:[
+    {de:"Mein Knie tut weh nach dem Training.",pt:"Meu joelho dói depois do treino."},
+    {de:"Er hat Schnupfen und Ohrenschmerzen.",pt:"Ele está com coriza e dor de ouvido."},
+    {de:"Haben Sie Fieber?",pt:"Você está com febre?"},
+    {de:"Ich muss zum Arzt gehen.",pt:"Preciso ir ao médico."},
+    {de:"Nehmen Sie die Tabletten dreimal täglich.",pt:"Tome os comprimidos três vezes ao dia."},
+    {de:"Was hilft gegen Erkältung?",pt:"O que ajuda para o resfriado?"},
+    {de:"Ich soll mehr Wasser trinken.",pt:"Devo beber mais água.",note:"sollen = dever"},
+    {de:"Ich brauche eine Apotheke.",pt:"Preciso de uma farmácia."},
+  ]},
+  gramatica:{icon:"📚",name:"Gramática",s:[
+    {de:"Ich werde morgen früh aufwachen.",pt:"Vou acordar cedo amanhã.",note:"Futur I"},
+    {de:"Wir werden uns am Hauptbahnhof treffen.",pt:"Vamos nos encontrar na estação central.",note:"sich treffen"},
+    {de:"Er soll mehr Wasser trinken.",pt:"Ele deve beber mais água.",note:"sollen – Ratschlag"},
+    {de:"Ich darf ohne Führerschein nicht fahren.",pt:"Não posso dirigir sem carteira.",note:"dürfen = ter permissão"},
+    {de:"Das Fahrrad gehört meiner Schwester.",pt:"A bicicleta pertence à minha irmã.",note:"gehören + Dativ: meiner (die)"},
+    {de:"Mir gefällt München besonders im Sommer.",pt:"Eu gosto muito de Munique no verão.",note:"gefallen + Dativ"},
+    {de:"Ich lade dich zum Essen ein.",pt:"Eu te convido para comer.",note:"dich = Akkusativ (du)"},
+    {de:"Ich danke dir für deine Hilfe.",pt:"Eu te agradeço pela sua ajuda.",note:"danken + Dativ: dir"},
+    {de:"Ohne meinen Kollegen bin ich verloren.",pt:"Sem meu colega estou perdido.",note:"ohne + Akkusativ"},
+  ]},
+};
+
+const TOPICS_NOVOS={
+  pdr:{icon:"🔧",name:"Oficina / PDR",s:[
+    {de:"Das Auto ist komplett verbeult.",pt:"O carro está completamente amassado.",note:"verbeult = amassado com muitas mossas"},
+    {de:"Wir müssen die Delle ausbeulen.",pt:"Temos que tirar o amassado.",note:"aus|beulen = tirar o amassado"},
+    {de:"Die Motorhaube ist eingedellt.",pt:"O capô está amassado para dentro.",note:"eingedellt = amassado para dentro"},
+    {de:"Wir müssen die Motorhaube austauschen.",pt:"Temos que trocar o capô.",note:"aus|tauschen = trocar"},
+    {de:"Die Rücklichter sind defekt. Wir müssen sie austauschen.",pt:"As lanternas traseiras estão defeituosas. Temos que trocá-las."},
+    {de:"Ich beule die Delle mit einem Werkzeug aus.",pt:"Eu tiro o amassado com uma ferramenta.",note:"aus|beulen separável"},
+    {de:"Wir müssen die Lackierung prüfen.",pt:"Temos que verificar a pintura.",note:"prüfen = verificar"},
+    {de:"Wie viele Dellen hat das Auto?",pt:"Quantos amassados o carro tem?"},
+    {de:"Das Auto ist morgen fertig.",pt:"O carro fica pronto amanhã."},
+    {de:"Wann können Sie das fertig haben?",pt:"Quando você consegue terminar?"},
+    {de:"Ich brauche mein Werkzeug.",pt:"Eu preciso das minhas ferramentas."},
+    {de:"Ich arbeite als Dellendrücker-Techniker.",pt:"Eu trabalho como técnico de PDR.",note:"Dellendrücker = empurrador de amassados"},
+    {de:"Es hat stark gehagelt. Wir haben viel Arbeit.",pt:"Choveu granizo forte. Temos muito trabalho.",note:"hageln = cair granizo"},
+    {de:"Die Karosserie ist aus Aluminium.",pt:"A carroceria é de alumínio.",note:"Karosserie = carroceria"},
+    {de:"Ich kontrolliere das Auto auf Schäden.",pt:"Eu verifico o carro em busca de danos.",note:"auf Schäden = em busca de danos"},
+    {de:"Können Sie mir sagen, wie viele Dellen das Auto hat?",pt:"Pode me dizer quantos amassados o carro tem?"},
+    {de:"Ich bin seit zweitausendeinundzwanzig mit dieser Firma zusammen.",pt:"Estou com essa empresa desde 2021."},
+    {de:"Ich komme jedes Jahr nach Deutschland, wenn es gehagelt hat.",pt:"Eu venho todo ano para a Alemanha quando cai granizo.",note:"wenn = quando (condicional)"},
+  ]},
+  dialogo:{icon:"💬",name:"Diálogo diário",s:[
+    {de:"Wie geht es Ihnen?",pt:"Como o senhor está?",note:"forma formal"},
+    {de:"Mir geht es gut, danke. Und Ihnen?",pt:"Estou bem, obrigado. E o senhor?"},
+    {de:"Können Sie bitte langsamer sprechen?",pt:"Pode falar mais devagar, por favor?",note:"muito útil no dia a dia!"},
+    {de:"Ich habe das nicht verstanden. Wie bitte?",pt:"Não entendi. Como?",note:"Wie bitte = como? (educado)"},
+    {de:"Können Sie das bitte wiederholen?",pt:"Pode repetir, por favor?"},
+    {de:"Sprechen Sie Englisch?",pt:"O senhor fala inglês?"},
+    {de:"Ich spreche ein bisschen Deutsch.",pt:"Eu falo um pouco de alemão."},
+    {de:"Ich lerne noch Deutsch.",pt:"Ainda estou aprendendo alemão."},
+    {de:"Das stimmt.",pt:"É verdade. / Está correto.",note:"sehr nützlich!"},
+    {de:"Ich verstehe.",pt:"Eu entendo."},
+    {de:"Ich weiß nicht genau.",pt:"Não sei ao certo."},
+    {de:"Kein Problem!",pt:"Sem problema!"},
+    {de:"Das ist sehr nett von Ihnen.",pt:"Isso é muito gentil da sua parte."},
+    {de:"Entschuldigung, ich habe einen Fehler gemacht.",pt:"Com licença, eu cometi um erro.",note:"Fehler = erro"},
+    {de:"Ich bin neu hier in Deutschland.",pt:"Sou novo aqui na Alemanha."},
+    {de:"Ich wohne in Bretten, in der Nähe von Karlsruhe.",pt:"Moro em Bretten, perto de Karlsruhe."},
+    {de:"Ich bin für die Arbeit hier.",pt:"Estou aqui pelo trabalho."},
+    {de:"Ich bleibe ungefähr drei Monate.",pt:"Fico aqui aproximadamente três meses."},
+    {de:"Das Wetter ist heute sehr schön.",pt:"O tempo está muito bonito hoje."},
+    {de:"Es ist kälter als in Brasilien.",pt:"Está mais frio do que no Brasil.",note:"Komparativ: kalt → kälter"},
+  ]},
+  supermarkt:{icon:"🛒",name:"Supermercado",s:[
+    {de:"Wo finde ich die Milch?",pt:"Onde encontro o leite?"},
+    {de:"Haben Sie Brot ohne Gluten?",pt:"Vocês têm pão sem glúten?"},
+    {de:"Was kostet das?",pt:"Quanto custa isso?"},
+    {de:"Ich möchte das bitte.",pt:"Eu gostaria disso, por favor."},
+    {de:"Haben Sie eine Tüte?",pt:"Vocês têm uma sacola?",note:"Tüte = sacola plástica"},
+    {de:"Ich bezahle mit Karte.",pt:"Eu pago com cartão."},
+    {de:"Wo ist die Kasse?",pt:"Onde fica o caixa?",note:"Kasse = caixa"},
+    {de:"Kann ich bitte eine Quittung haben?",pt:"Posso ter um recibo, por favor?",note:"Quittung = recibo"},
+    {de:"Ich suche den Joghurt.",pt:"Estou procurando o iogurte."},
+    {de:"Entschuldigung, wo ist die Abteilung für Obst und Gemüse?",pt:"Com licença, onde fica a seção de frutas e legumes?",note:"Abteilung = seção"},
+    {de:"Das ist zu teuer.",pt:"Isso é muito caro."},
+    {de:"Haben Sie etwas Günstigeres?",pt:"Vocês têm algo mais barato?",note:"günstig = barato"},
+    {de:"Ich brauche noch Eier und Butter.",pt:"Ainda preciso de ovos e manteiga."},
+    {de:"Ist das frisch?",pt:"Isso está fresco?"},
+    {de:"Bis wann ist das haltbar?",pt:"Até quando está no prazo de validade?",note:"haltbar = prazo de validade"},
+  ]},
+  farmacia:{icon:"💊",name:"Farmácia / Médico",s:[
+    {de:"Ich fühle mich nicht gut.",pt:"Não estou me sentindo bem.",note:"sich fühlen = sentir-se"},
+    {de:"Ich habe Fieber und Halsschmerzen.",pt:"Estou com febre e dor de garganta."},
+    {de:"Ich habe eine Erkältung.",pt:"Estou com um resfriado.",note:"Erkältung = resfriado"},
+    {de:"Haben Sie etwas gegen Kopfschmerzen?",pt:"Vocês têm algo para dor de cabeça?",note:"gegen + Akkusativ"},
+    {de:"Ich brauche ein Rezept.",pt:"Preciso de uma receita médica.",note:"Rezept = receita"},
+    {de:"Ich bin allergisch gegen Penicillin.",pt:"Sou alérgico à penicilina.",note:"allergisch gegen + Akkusativ"},
+    {de:"Wie oft soll ich das nehmen?",pt:"Quantas vezes devo tomar isso?"},
+    {de:"Ich brauche einen Arzttermin.",pt:"Preciso de uma consulta médica.",note:"Arzttermin = consulta médica"},
+    {de:"Mein Rücken tut seit einer Woche weh.",pt:"Minha costas dói há uma semana.",note:"seit + Dativ = há quanto tempo"},
+    {de:"Ich hatte einen Unfall.",pt:"Eu tive um acidente.",note:"Unfall = acidente"},
+    {de:"Können Sie mir ein Medikament empfehlen?",pt:"Pode me recomendar um remédio?",note:"empfehlen = recomendar"},
+    {de:"Ich nehme diese Tabletten dreimal täglich.",pt:"Tomo esses comprimidos três vezes ao dia."},
+    {de:"Gute Besserung!",pt:"Melhoras!",note:"expressão muito usada"},
+  ]},
+  pessoas:{icon:"👤",name:"Descrever pessoas",s:[
+    {de:"Er ist sehr groß und schlank.",pt:"Ele é muito alto e magro.",note:"schlank = magro/esguio"},
+    {de:"Sie hat blonde, lockige Haare.",pt:"Ela tem cabelos loiros e cacheados.",note:"lockig = cacheado"},
+    {de:"Er hat kurze, dunkle Haare und einen Bart.",pt:"Ele tem cabelos curtos e escuros e barba."},
+    {de:"Sie trägt eine Brille.",pt:"Ela usa óculos.",note:"tragen = usar/vestir"},
+    {de:"Er hat eine Glatze.",pt:"Ele tem careca.",note:"Glatze = careca"},
+    {de:"Meine Frau ist jünger als ich.",pt:"Minha esposa é mais jovem do que eu.",note:"Komparativ: jung → jünger"},
+    {de:"Er ist fast genauso groß wie ich.",pt:"Ele é quase tão alto quanto eu.",note:"genauso...wie = tão...quanto"},
+    {de:"Sie ist sehr sympathisch und kreativ.",pt:"Ela é muito simpática e criativa."},
+    {de:"Er arbeitet sehr fleißig.",pt:"Ele trabalha muito arduamente.",note:"fleißig = trabalhador/esforçado"},
+    {de:"Ich finde ihn sehr nett.",pt:"Eu acho ele muito legal.",note:"ihn = Akkusativ (er)"},
+    {de:"Sie sieht jung aus.",pt:"Ela parece jovem.",note:"aus|sehen = parecer"},
+    {de:"Mein Bruder ist kräftig und sportlich.",pt:"Meu irmão é forte e atlético.",note:"kräftig = forte/robusto"},
+  ]},
+  futur:{icon:"🚀",name:"Futur I / Planos",s:[
+    {de:"Ich werde nächsten Monat nach Hause fliegen.",pt:"Vou voar para casa no mês que vem.",note:"Futur I: werden + Infinitiv"},
+    {de:"Meine Frau wird mich bald besuchen.",pt:"Minha esposa vai me visitar em breve."},
+    {de:"Wir werden das Geld sparen.",pt:"Vamos economizar o dinheiro.",note:"sparen = economizar"},
+    {de:"Ich werde am Wochenende die Stadt erkunden.",pt:"Vou explorar a cidade no fim de semana.",note:"erkunden = explorar"},
+    {de:"Es wird heute regnen.",pt:"Vai chover hoje.",note:"regnen = chover"},
+    {de:"Ich werde meine Frau jeden Tag anrufen.",pt:"Vou ligar para minha esposa todos os dias.",note:"an|rufen separável"},
+    {de:"Wir werden nächstes Jahr wieder nach Deutschland kommen.",pt:"Vamos voltar para a Alemanha no próximo ano."},
+    {de:"Ich lerne Deutsch, um besser zu kommunizieren.",pt:"Aprendo alemão para me comunicar melhor.",note:"um...zu + Infinitiv = para"},
+    {de:"Ich bin nach Deutschland gekommen, um Geld zu verdienen.",pt:"Vim para a Alemanha para ganhar dinheiro.",note:"um...zu + Infinitiv"},
+    {de:"Nachdem ich nach Hause komme, werde ich ausruhen.",pt:"Depois que eu chegar em casa, vou descansar.",note:"nachdem + verbo no final"},
+    {de:"Bevor ich schlafe, rufe ich meine Frau an.",pt:"Antes de dormir, ligo para minha esposa.",note:"bevor + verbo no final"},
+    {de:"Wenn ich mehr Deutsch spreche, wird es leichter.",pt:"Quando eu falar mais alemão, vai ficar mais fácil.",note:"wenn + verbo no final"},
+    {de:"Ich will eine eigene Firma in Deutschland gründen.",pt:"Quero fundar minha própria empresa na Alemanha.",note:"gründen = fundar"},
+    {de:"Das wird nicht einfach sein, aber ich schaffe das.",pt:"Não vai ser fácil, mas eu consigo.",note:"schaffen = conseguir"},
+  ]},
+};
+
+const ALL_TOPICS={...TOPICS_AULAS,...TOPICS_TEMAS,...TOPICS_NOVOS};
+let currentMode='de-pt';
+const FLOW_TEXTS={
+  'de-pt':'🇩🇪 <b>Alemão</b> → ⏸️ <b>Repita</b> → 🇩🇪 <b>Alemão de novo</b> → ⏸️ <b>Repita</b> → 🇧🇷 <b>Português</b>',
+  'pt-de':'🇧🇷 <b>Português</b> → ⏸️ <b>Prepare</b> → 🇩🇪 <b>Alemão</b> → ⏸️ <b>Repita</b> → 🇩🇪 <b>Alemão de novo</b> → ⏸️ <b>Repita</b>'
+};
+function setMode(m){
+  currentMode=m;
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('mode-'+m).classList.add('active');
+  document.getElementById('flowBox').innerHTML=FLOW_TEXTS[m];
+}
+
+let audioCtx=null,kaInterval=null;
+function initAudioContext(){if(audioCtx)return;audioCtx=new(window.AudioContext||window.webkitAudioContext)();}
+function playKeepAliveBeep(){
+  if(!audioCtx)return;
+  try{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);g.gain.setValueAtTime(0.001,audioCtx.currentTime);o.frequency.setValueAtTime(440,audioCtx.currentTime);o.start(audioCtx.currentTime);o.stop(audioCtx.currentTime+0.1);}catch(e){}
+}
+function startKeepAlive(){
+  initAudioContext();
+  if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume();
+  if(kaInterval)return;
+  kaInterval=setInterval(playKeepAliveBeep,25000);
+  document.getElementById('kaDot').classList.add('active');
+  document.getElementById('kaStatus').textContent='Áudio de fundo: ativo ✓';
+}
+function stopKeepAlive(){
+  if(kaInterval){clearInterval(kaInterval);kaInterval=null;}
+  document.getElementById('kaDot').classList.remove('active');
+  document.getElementById('kaStatus').textContent='Áudio de fundo: inativo';
+}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&audioCtx&&audioCtx.state==='suspended')audioCtx.resume();});
+
+let voicesDE=[],voicesPT=[],allVoices=[];
+function initVoices(){
+  allVoices=speechSynthesis.getVoices();
+  if(!allVoices.length)return;
+  voicesDE=allVoices.filter(v=>v.lang.startsWith('de'));
+  voicesPT=allVoices.filter(v=>v.lang.startsWith('pt'));
+  if(!voicesDE.length)voicesDE=allVoices;
+  if(!voicesPT.length)voicesPT=allVoices;
+  const sDE=document.getElementById('selDE'),sPT=document.getElementById('selPT');
+  sDE.innerHTML='';sPT.innerHTML='';
+  voicesDE.forEach((v,i)=>{const o=document.createElement('option');o.value=i;o.textContent=v.name+' ('+v.lang+')';sDE.appendChild(o);});
+  voicesPT.forEach((v,i)=>{const o=document.createElement('option');o.value=i;o.textContent=v.name+' ('+v.lang+')';if(v.lang==='pt-BR')o.selected=true;sPT.appendChild(o);});
+}
+speechSynthesis.onvoiceschanged=initVoices;
+setTimeout(initVoices,300);setTimeout(initVoices,1000);
+function getVoiceDE(){return voicesDE[parseInt(document.getElementById('selDE').value)||0];}
+function getVoicePT(){return voicesPT[parseInt(document.getElementById('selPT').value)||0];}
+function testVoice(lang){
+  startKeepAlive();speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(lang==='de'?'Guten Morgen! Wie geht es Ihnen heute?':'Bom dia! Como vai você hoje?');
+  u.voice=lang==='de'?getVoiceDE():getVoicePT();
+  u.rate=lang==='de'?parseFloat(document.getElementById('rde').value):parseFloat(document.getElementById('rpt').value);
+  speechSynthesis.speak(u);
+}
+
+let activeTopic='berlin',queue=[],idx=0,playing=false,cdTimer=null;
+function rebuild(){
+  const was=playing;playing=false;speechSynthesis.cancel();stopCd();
+  let src=[...(ALL_TOPICS[activeTopic]?.s||[])];
+  if(document.getElementById('shuf').checked)src.sort(()=>Math.random()-.5);
+  queue=src;idx=0;updateDisplay();
+  if(was){playing=true;document.getElementById('pbtn').innerHTML='&#9646;&#9646;';loop();}
+}
+function updateDisplay(){
+  const n=queue.length,pct=n>1?Math.round((idx/(n-1))*100):0;
+  document.getElementById('pfill').style.width=pct+'%';
+  document.getElementById('ppct').textContent=pct+'%';
+  document.getElementById('pof').textContent=(idx+1)+' de '+n;
+  document.getElementById('ctxt').textContent=(idx+1)+' / '+n;
+  const s=queue[idx];
+  if(s){document.getElementById('sde').textContent=s.de;document.getElementById('spt').textContent=s.pt;document.getElementById('snote').textContent=s.note||'';}
+  hideCd();
+}
+function setBadge(p){
+  const b=document.getElementById('badge'),l=document.getElementById('slang');
+  if(p==='de'){b.textContent='🇩🇪 Alemão';b.className='badge b-de';l.textContent='🇩🇪 Escute o alemão';}
+  else if(p==='pt'){b.textContent='🇧🇷 Português';b.className='badge b-pt';l.textContent='🇧🇷 Português';}
+  else if(p==='rep1'){b.textContent='🗣️ Repita!';b.className='badge b-rep';l.textContent='🗣️ Repita em voz alta!';}
+  else if(p==='rep2'){b.textContent='🗣️ De novo!';b.className='badge b-rep';l.textContent='🗣️ Mais uma vez!';}
+  else if(p==='prep'){b.textContent='🤔 Prepare!';b.className='badge b-rep';l.textContent='🤔 Pense na tradução em alemão!';}
+  else{b.textContent='Pronto';b.className='badge b-idle';l.textContent='Pressione play';}
+}
+function stopCd(){if(cdTimer){clearInterval(cdTimer);cdTimer=null;}hideCd();}
+function hideCd(){document.getElementById('cdWrap').classList.remove('show');}
+function runCd(seconds){
+  return new Promise(res=>{
+    const bar=document.getElementById('cdBar'),num=document.getElementById('cdNum'),wrap=document.getElementById('cdWrap');
+    let rem=seconds;
+    num.textContent=rem+'s';
+    bar.style.transition='none';bar.style.width='100%';
+    wrap.classList.add('show');
+    bar.getBoundingClientRect();
+    bar.style.transition='width '+seconds+'s linear';bar.style.width='0%';
+    cdTimer=setInterval(()=>{rem--;num.textContent=rem>0?rem+'s':'✓';if(rem<=0){stopCd();res();}},1000);
+  });
+}
+function speak(text,voice,rate){
+  return new Promise(res=>{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    if(voice)u.voice=voice;u.rate=parseFloat(rate);
+    const ka=setInterval(()=>{if(!speechSynthesis.speaking)clearInterval(ka);else{speechSynthesis.pause();speechSynthesis.resume();}},10000);
+    u.onend=()=>{clearInterval(ka);res();};u.onerror=()=>{clearInterval(ka);res();};
+    speechSynthesis.speak(u);
+  });
+}
+function sleep(s){return new Promise(r=>setTimeout(r,s*1000));}
+
+async function loop(){
+  const rDE=document.getElementById('rde').value,rPT=document.getElementById('rpt').value;
+  const repSec=parseInt(document.getElementById('repi').value);
+  const pause=parseFloat(document.getElementById('paui').value);
+  const vDE=getVoiceDE(),vPT=getVoicePT();
+  while(playing&&idx<queue.length){
+    const s=queue[idx];updateDisplay();
+    if(currentMode==='de-pt'){
+      setBadge('de');   await speak(s.de,vDE,rDE); if(!playing)break;
+      setBadge('rep1'); await runCd(repSec);        if(!playing)break;
+      setBadge('de');   await speak(s.de,vDE,rDE); if(!playing)break;
+      setBadge('rep2'); await runCd(repSec);        if(!playing)break;
+      setBadge('pt');   await speak(s.pt,vPT,rPT); if(!playing)break;
+    }else{
+      setBadge('pt');   await speak(s.pt,vPT,rPT); if(!playing)break;
+      setBadge('prep'); await runCd(repSec);        if(!playing)break;
+      setBadge('de');   await speak(s.de,vDE,rDE); if(!playing)break;
+      setBadge('rep1'); await runCd(repSec);        if(!playing)break;
+      setBadge('de');   await speak(s.de,vDE,rDE); if(!playing)break;
+      setBadge('rep2'); await runCd(repSec);        if(!playing)break;
+    }
+    await sleep(pause);if(!playing)break;
+    idx++;updateDisplay();
+  }
+  if(idx>=queue.length&&playing){
+    idx=0;playing=false;
+    document.getElementById('pbtn').innerHTML='&#9654;';
+    setBadge('idle');stopKeepAlive();
+    showMsg('✅ Tema concluído! Pressione play para repetir.','ok');
+  }
+}
+
+async function togglePlay(){
+  if(playing){
+    playing=false;speechSynthesis.cancel();stopCd();stopKeepAlive();
+    document.getElementById('pbtn').innerHTML='&#9654;';setBadge('idle');
+  }else{
+    if(!allVoices.length){showMsg('Nenhuma voz encontrada. Abra no Safari.','err');return;}
+    startKeepAlive();playing=true;
+    document.getElementById('pbtn').innerHTML='&#9646;&#9646;';loop();
+  }
+}
+function go(dir){
+  const was=playing;playing=false;speechSynthesis.cancel();stopCd();
+  idx=Math.max(0,Math.min(queue.length-1,idx+dir));updateDisplay();
+  if(was){playing=true;document.getElementById('pbtn').innerHTML='&#9646;&#9646;';loop();}
+}
+function seekBar(e){
+  const r=e.currentTarget.getBoundingClientRect();
+  const was=playing;playing=false;speechSynthesis.cancel();stopCd();
+  idx=Math.round((e.clientX-r.left)/r.width*(queue.length-1));updateDisplay();
+  if(was){playing=true;document.getElementById('pbtn').innerHTML='&#9646;&#9646;';loop();}
+}
+function selectTopic(key){
+  activeTopic=key;
+  document.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('t-'+key).classList.add('active');
+  rebuild();
+}
+function showMsg(t,type){
+  const b=document.getElementById('msg');
+  b.textContent=t;b.className='msgbox '+(type||'err');b.style.display='block';
+  setTimeout(()=>b.style.display='none',4000);
+}
+
+document.getElementById('tgrid-aulas').innerHTML=Object.entries(TOPICS_AULAS).map(([k,t])=>
+  `<button class="tbtn${k===activeTopic?' active':''}" id="t-${k}" onclick="selectTopic('${k}')">
+    <span class="ico">${t.icon}</span><span class="nm">${t.name}</span><span class="cnt">${t.s.length} frases</span>
+  </button>`).join('');
+document.getElementById('tgrid-temas').innerHTML=Object.entries(TOPICS_TEMAS).map(([k,t])=>
+  `<button class="tbtn${k===activeTopic?' active':''}" id="t-${k}" onclick="selectTopic('${k}')">
+    <span class="ico">${t.icon}</span><span class="nm">${t.name}</span><span class="cnt">${t.s.length} frases</span>
+  </button>`).join('');
+document.getElementById('tgrid-novos').innerHTML=Object.entries(TOPICS_NOVOS).map(([k,t])=>
+  `<button class="tbtn${k===activeTopic?' active':''}" id="t-${k}" onclick="selectTopic('${k}')">
+    <span class="ico">${t.icon}</span><span class="nm">${t.name}</span><span class="cnt">${t.s.length} frases</span>
+  </button>`).join('');
+
+rebuild();
+</script>
+</body>
+</html>
